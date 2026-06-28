@@ -1,0 +1,56 @@
+Hafuh Changelog
+========================================================================
+Project: Hafuh (Hebrew-English Layout Converter)
+Version Progression: v1.0.0 -> v1.5.1
+========================================================================
+
+v1.5.1
+------------------------------------------------------------------------
+* Added a dedicated TTS Voice settings dropdown menu.
+* Implemented device speech synthesis engine polling, filtering specifically for English and Hebrew system voices.
+* Added persistent local storage tracking for the selected custom voice.
+
+v1.5.0
+------------------------------------------------------------------------
+* Implemented native Text-to-Speech (TTS) reading support ("Speak" button) with automatic voice-language routing.
+* Added real-time text statistic counters (word count and character count) displayed beneath both textareas.
+
+v1.4.1
+------------------------------------------------------------------------
+* Resolved a logic bug in the 'Case Aa' feature where uppercase text failed to transition because word-boundary capitalization matched itself.
+* Ensured lowercase to uppercase to Title Case cycling.
+
+v1.4.0
+------------------------------------------------------------------------
+* Implemented "Flip" button to reverse text character sequences to resolve backward-Hebrew parsing issues in legacy systems and PDFs.
+* Implemented "Case Aa" button to cycle English results through lowercase, UPPERCASE, and Title Case.
+* Added quick external web actions bar ("Search on Google" and "Google Translate") with automatic output-language routing.
+
+v1.3.0
+------------------------------------------------------------------------
+* Re-enabled dir="auto" alongside programmatic event dispatching to resolve browser orientation bugs.
+* Enabled the "Auto-Copy on type stop" toggle by default.
+* Implemented configurable delay setting options (0.5s, 1.0s, 1.5s, 2.0s, 3.0s) with a default delay of 1.5 seconds.
+* Integrated persistent storage configurations for toggle states and custom delay settings.
+
+v1.2.0
+------------------------------------------------------------------------
+* Removed dir="auto" globally to resolve layout conflicts, replacing it with programmatic CSS direction attributes.
+* Added a "Clear" utility button to wipe both textareas and reset manual alignment overrides.
+* Implemented a sliding Dark Mode toggle with persistent storage.
+* Implemented a dynamic history log showing the last 5 conversions with individual copy buttons.
+* Configured global keyboard shortcuts (Esc to clear text fields, Ctrl + Enter to manually force convert).
+
+v1.1.0
+------------------------------------------------------------------------
+* Replaced the manual "Auto-Convert" button with a checked toggle switch.
+* Implemented live real-time "as-you-type" conversion when the toggle is enabled.
+* Bound pasting actions to automatically convert if the live conversion toggle is ON.
+
+v1.0.0 (Initial Release)
+------------------------------------------------------------------------
+* Established standard QWERTY and Hebrew layout character mappings.
+* Implemented basic structural layout with Input/Output boxes and manual conversion triggers.
+* Added browser-level dir="auto" for text alignment.
+* Implemented "Copy from Clipboard" (paste) and "Copy to Clipboard" utility buttons.
+* Added Ctrl + Left Shift (LTR) and Ctrl + Right Shift (RTL) manual direction listeners inside the input fields.
