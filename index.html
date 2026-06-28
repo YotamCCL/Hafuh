@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ADD THIS INSIDE THE <head> OF index.html -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hafuh - Hebrew-English Layout Converter</title>
+    <style>
+        /* CSS Theme Variables */
+        :root {
+            --bg-color: #f9f9f9;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #ccc;
+            --btn-utility-bg: #e2e8f0;
+            --btn-utility-text: #333;
+            --btn-utility-border: #cbd5e1;
+            --info-text-color: #666;
+            --toggle-bg: #cbd5e1;
+            --toggle-active: #007bff;
+            --link-color: #007bff;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-color: #f8fafc;
+            --border-color: #475569;
+            --btn-utility-bg: #334155;
+            --btn-utility-text: #f1f5f9;
+            --btn-utility-border: #475569;
+            --info-text-color: #94a3b8;
+            --toggle-bg: #475569;
+            --toggle-active: #3b82f6;
+            --link-color: #60a5fa;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.2s, color 0.2s;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        h1 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 24px;
+        }
+        .version {
+            color: var(--info-text-color);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .label-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        label {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            resize: vertical;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+        
+        /* Toggles Wrapper */
+        .toggles-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: stretch;
+        }
+        .toggle-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 6px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--toggle-bg);
+            transition: .3s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .3s;
+        }
+        input:checked + .slider {
+            background-color: var(--toggle-active);
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .slider.round {
+            border-radius: 24px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        .toggle-label {
+            font-weight: bold;
+            color: var(--text-color);
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Delay Select dropdown menu styling */
+        .delay-setting {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+        .delay-label {
+            font-size: 11px;
+            color: var(--info-text-color);
+        }
+        .delay-select {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            outline: none;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        /* Speech Settings Bar Styles */
+        .speech-settings {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 6px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .speech-select {
+            flex: 1;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            outline: none;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        .buttons-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-secondary {
+            flex: 1;
+            background-color: #6c757d;
+            color: white;
+            font-size: 16px;
+            padding: 12px;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-utility {
+            background-color: var(--btn-utility-bg);
+            color: var(--btn-utility-text);
+            font-size: 13px;
+            padding: 5px 10px;
+            border: 1px solid var(--btn-utility-border);
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+        .btn-utility:hover {
+            opacity: 0.9;
+        }
+        .info-text {
+            font-size: 11px;
+            color: var(--info-text-color);
+            margin-top: 0;
+        }
+
+        /* Meta Row for Stats and Tips */
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+        }
+        .meta-row .info-text {
+            flex: 1;
+        }
+        .meta-row .stats-text {
+            font-size: 11px;
+            color: var(--info-text-color);
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+
+        /* External Web Actions styling */
+        .web-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .action-link {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .action-link:hover {
+            text-decoration: underline;
+        }
+        .action-separator {
+            color: var(--info-text-color);
+        }
+
+        /* History Styles */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 5px;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .history-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 80%;
+            color: var(--text-color);
+        }
+        .utility-group {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>Hafuh Layout Converter</h1>
+        <button class="btn-utility" id="themeToggleBtn" onclick="toggleTheme()">Dark Mode</button>
+    </div>
+    <div class="version">v1.5.1</div>
+    
+    <!-- Input Section -->
+    <div class="section">
+        <div class="label-container">
+            <label for="inputText">Type or paste text here:</label>
+            <div class="utility-group">
+                <button class="btn-utility" onclick="speakText('inputText')">Speak</button>
+                <button class="btn-utility" onclick="flipText('inputText')">Flip</button>
+                <button class="btn-utility" onclick="clearAll()">Clear</button>
+                <button class="btn-utility" onclick="pasteFromClipboard()">Copy from Clipboard</button>
+            </div>
+        </div>
+        <!-- dir="auto" enables native browser text direction detection -->
+        <textarea id="inputText" dir="auto" placeholder="e.g., 'שקש' or 'gcrh,'"></textarea>
+        <div class="meta-row">
+            <span class="info-text">Tip: Use <b>Ctrl + Left Shift</b> for LTR, or <b>Ctrl + Right Shift</b> for RTL. Press <b>Esc</b> to clear.</span>
+            <span class="stats-text" id="inputTextStats">Words: 0 | Characters: 0</span>
+        </div>
+    </div>
+    
+    <!-- Toggle Switches Area -->
+    <div class="toggles-wrapper">
+        <div class="toggle-container">
+            <div class="toggle-row">
+                <label class="switch">
+                    <input type="checkbox" id="autoConvertToggle" checked>
+                    <span class="slider round"></span>
+                </label>
+                <label for="autoConvertToggle" class="toggle-label">Auto-Convert as you type</label>
+            </div>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle-row">
+                <label class="switch">
+                    <input type="checkbox" id="autoCopyToggle" checked>
+                    <span class="slider round"></span>
+                </label>
+                <label for="autoCopyToggle" class="toggle-label">Auto-Copy on type stop</label>
+            </div>
+            <!-- Delay Options Selector -->
+            <div class="delay-setting">
+                <span class="delay-label">Delay duration:</span>
+                <select id="autoCopyDelay" class="delay-select">
+                    <option value="500">0.5 sec</option>
+                    <option value="1000">1.0 sec</option>
+                    <option value="1500" selected>1.5 sec</option>
+                    <option value="2000">2.0 sec</option>
+                    <option value="3000">3.0 sec</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Speech Settings Panel -->
+    <div class="speech-settings">
+        <span class="toggle-label" style="font-size: 13px;">TTS Voice:</span>
+        <select id="voiceSelect" class="speech-select">
+            <option value="auto">Auto-detect Voice (Recommended)</option>
+        </select>
+    </div>
+    
+    <!-- Manual Conversion Actions -->
+    <div class="buttons-row">
+        <button class="btn-secondary" onclick="convertEngToHeb()">To Hebrew</button>
+        <button class="btn-secondary" onclick="convertHebToEng()">To English</button>
+    </div>
+    
+    <!-- Output Section -->
+    <div class="section">
+        <div class="label-container">
+            <label for="outputText">Converted Result:</label>
+            <div class="utility-group">
+                <button class="btn-utility" onclick="speakText('outputText')">Speak</button>
+                <button class="btn-utility" onclick="flipText('outputText')">Flip</button>
+                <button class="btn-utility" onclick="cycleCase()">Case Aa</button>
+                <button class="btn-utility" id="copyBtn" onclick="copyToClipboard()">Copy to Clipboard</button>
+            </div>
+        </div>
+        <!-- dir="auto" handles output alignment based on the converted result -->
+        <textarea id="outputText" dir="auto" readonly placeholder="Result will appear here..."></textarea>
+        
+        <!-- External Web Actions Link Bar -->
+        <div class="web-actions" id="webActions" style="display: none;">
+            <a id="searchLink" href="#" target="_blank" class="action-link">Search on Google</a>
+            <span class="action-separator">|</span>
+            <a id="translateLink" href="#" target="_blank" class="action-link">Google Translate</a>
+        </div>
+
+        <div class="meta-row" style="margin-top: 8px;">
+            <span class="info-text">Tip: Use <b>Ctrl + Left Shift</b> for LTR, and <b>Ctrl + Right Shift</b> for RTL. Press <b>Ctrl + Enter</b> to force convert.</span>
+            <span class="stats-text" id="outputTextStats">Words: 0 | Characters: 0</span>
+        </div>
+    </div>
+
+    <!-- History Log Section -->
+    <div class="section" id="historySection" style="display: none;">
+        <label>Recent Conversions:</label>
+        <div class="history-list" id="historyList"></div>
+    </div>
+
+    <script>
+        const engToHebMap = {
+            'q': '/', 'w': "'", 'e': 'ק', 'r': 'ר', 't': 'א', 'y': 'ט', 'u': 'ו', 'i': 'ן', 'o': 'ם', 'p': 'פ', '[': ']', ']': '[',
+            'a': 'ש', 's': 'ד', 'd': 'ג', 'f': 'כ', 'g': 'ע', 'h': 'י', 'j': 'ח', 'k': 'ל', 'l': 'ך', ';': 'ף', "'": ',',
+            'z': 'ז', 'x': 'ס', 'c': 'ב', 'v': 'ה', 'b': 'נ', 'n': 'מ', 'm': 'צ', ',': 'ת', '.': 'ץ', '/': '.',
+            'Q': '/', 'W': "'", 'E': 'ק', 'R': 'ר', 'T': 'א', 'Y': 'ט', 'U': 'ו', 'I': 'ן', 'O': 'ם', 'P': 'פ', '{': '}', '}': '{',
+            'A': 'ש', 'S': 'ד', 'D': 'ג', 'F': 'כ', 'G': 'ע', 'H': 'י', 'J': 'ח', 'K': '防', 'L': 'ך', ':': 'ף', '"': ',',
+            'Z': 'ז', 'X': 'ס', 'C': 'ב', 'V': 'ה', 'B': 'נ', 'N': 'מ', 'M': 'צ', '<': 'ת', '>': 'ץ', '?': '.'
+        };
+
+        const hebToEngMap = {
+            '/': 'q', "'": 'w', 'ק': 'e', 'ר': 'r', 'א': 't', 'ט': 'y', 'ו': 'u', 'ן': 'i', 'ם': 'o', 'פ': 'p', ']': '[', '[': ']',
+            'ש': 'a', 'ד': 's', 'ג': 'd', 'כ': 'f', 'ע': 'g', 'י': 'h', 'ח': 'j', 'ל': 'k', 'ך': 'l', 'ף': ';', ',': "'",
+            'ז': 'z', 'ס': 'x', 'ב': 'c', 'ה': 'v', 'נ': 'b', 'מ': 'n', 'צ': 'm', 'ת': ',', 'ץ': '.', '.': '/'
+        };
+
+        let autoCopyTimeout = null;
+        let historyLog = [];
+        let voicesList = [];
+
+        function translateText(text, map) {
+            return text.split('').map(char => map[char] !== undefined ? map[char] : char).join('');
+        }
+
+        function convertEngToHeb(shouldLogHistory = true) {
+            const input = document.getElementById('inputText').value;
+            const outputEl = document.getElementById('outputText');
+            outputEl.dir = 'auto'; // Reset manual alignment override
+            const converted = translateText(input, engToHebMap);
+            outputEl.value = converted;
+
+            if (shouldLogHistory) {
+                addToHistory(input, converted);
+            }
+            triggerAutoCopyDebounce();
+            updateWebActions();
+            refreshStats();
+        }
+
+        function convertHebToEng(shouldLogHistory = true) {
+            const input = document.getElementById('inputText').value;
+            const outputEl = document.getElementById('outputText');
+            outputEl.dir = 'auto'; // Reset manual alignment override
+            const converted = translateText(input, hebToEngMap);
+            outputEl.value = converted;
+
+            if (shouldLogHistory) {
+                addToHistory(input, converted);
+            }
+            triggerAutoCopyDebounce();
+            updateWebActions();
+            refreshStats();
+        }
+
+        function convertAuto(shouldLogHistory = true) {
+            const input = document.getElementById('inputText').value;
+            
+            let hebCount = 0;
+            let engCount = 0;
+            
+            for (let char of input) {
+                if (char >= 'א' && char <= 'ת') {
+                    hebCount++;
+                } else if ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z')) {
+                    engCount++;
+                }
+            }
+            
+            if (hebCount > engCount) {
+                convertHebToEng(shouldLogHistory);
+            } else {
+                convertEngToHeb(shouldLogHistory);
+            }
+        }
+
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                const inputEl = document.getElementById('inputText');
+                inputEl.dir = 'auto'; // Reset manual override
+                inputEl.value = text;
+                
+                // Dispatches input event to evaluate pasted content alignment and trigger auto-conversion
+                inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                
+                // For direct pastes, we log history immediately
+                const outputVal = document.getElementById('outputText').value;
+                addToHistory(text, outputVal);
+                refreshStats();
+            } catch (err) {
+                alert('Unable to read from clipboard. Please ensure you grant clipboard permission.');
+                console.error('Clipboard read error: ', err);
+            }
+        }
+
+        async function copyToClipboard() {
+            const text = document.getElementById('outputText').value;
+            if (!text) {
+                alert('There is no converted text to copy yet.');
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(text);
+                const inputVal = document.getElementById('inputText').value;
+                addToHistory(inputVal, text);
+
+                const copyBtn = document.getElementById('copyBtn');
+                showTemporaryText(copyBtn, 'Copied!');
+            } catch (err) {
+                alert('Unable to copy to clipboard.');
+                console.error('Clipboard write error: ', err);
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('inputText').dir = 'auto';
+            document.getElementById('outputText').dir = 'auto';
+            if (autoCopyTimeout) {
+                clearTimeout(autoCopyTimeout);
+            }
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            updateWebActions();
+            refreshStats();
+        }
+
+        // Feature 1: Reverse/Flip Text order in textareas
+        function flipText(textareaId) {
+            const el = document.getElementById(textareaId);
+            const text = el.value;
+            if (!text) return;
+            
+            const flipped = text.split('').reverse().join('');
+            el.value = flipped;
+
+            if (textareaId === 'outputText') {
+                const inputVal = document.getElementById('inputText').value;
+                addToHistory(inputVal, flipped);
+                triggerAutoCopyDebounce();
+                updateWebActions();
+            } else {
+                // If flipping the input, re-trigger live conversion if auto-convert is ON
+                const toggleEl = document.getElementById('autoConvertToggle');
+                if (toggleEl.checked) {
+                    convertAuto(false);
+                }
+            }
+            refreshStats();
+        }
+
+        // Feature 2: Cycle Casing logic for converted English output
+        function cycleCase() {
+            const outputEl = document.getElementById('outputText');
+            const text = outputEl.value;
+            if (!text.trim()) return;
+
+            const lower = text.toLowerCase();
+            const upper = text.toUpperCase();
+            
+            // To properly title-case an already uppercase string, 
+            // the text is first lowered before word boundary transformation.
+            const title = text.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+
+            if (text === lower) {
+                outputEl.value = upper;
+            } else if (text === upper) {
+                outputEl.value = title;
+            } else {
+                outputEl.value = lower;
+            }
+
+            const inputVal = document.getElementById('inputText').value;
+            addToHistory(inputVal, outputEl.value);
+            triggerAutoCopyDebounce();
+            updateWebActions();
+            refreshStats();
+        }
+
+        // Feature 4: Dynamically construct links for search/translation engines based on output text
+        function updateWebActions() {
+            const text = document.getElementById('outputText').value.trim();
+            const webActions = document.getElementById('webActions');
+            if (!text) {
+                webActions.style.display = 'none';
+                return;
+            }
+            webActions.style.display = 'flex';
+            
+            // Heuristic detection: If more than 30% of the text is Hebrew, we set translation target to English, else Hebrew
+            let hebCount = 0;
+            for (let char of text) {
+                if (char >= 'א' && char <= 'ת') hebCount++;
+            }
+            const ratio = hebCount / text.length;
+            const targetLang = ratio > 0.3 ? 'en' : 'iw'; // 'iw' is the ISO language code for Hebrew in Google systems
+            
+            const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(text)}`;
+            const translateUrl = `https://translate.google.com/?sl=auto&tl=${targetLang}&text=${encodeURIComponent(text)}&op=translate`;
+            
+            document.getElementById('searchLink').href = searchUrl;
+            document.getElementById('translateLink').href = translateUrl;
+        }
+
+        // Populates voice choices dynamically filtering only Hebrew & English engines
+        function populateVoiceList() {
+            if (typeof speechSynthesis === 'undefined') return;
+
+            voicesList = speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById('voiceSelect');
+            const savedVoiceName = localStorage.getItem('selectedVoiceName');
+
+            // Filter down to only English (en) and Hebrew (he/iw) languages
+            const filtered = voicesList.filter(v => {
+                const lang = v.lang.toLowerCase();
+                return lang.startsWith('en') || lang.startsWith('he') || lang.startsWith('iw');
+            });
+
+            // Re-populate dropdown while retaining Default selection option
+            voiceSelect.innerHTML = '<option value="auto">Auto-detect Voice (Recommended)</option>';
+
+            filtered.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.name;
+                opt.textContent = `${v.name} (${v.lang})`;
+                if (savedVoiceName && v.name === savedVoiceName) {
+                    opt.selected = true;
+                }
+                voiceSelect.appendChild(opt);
+            });
+        }
+
+        // Suggestion 1: Text-to-Speech (Read Aloud) Feature using the browser Synthesis API
+        function speakText(textareaId) {
+            if (!('speechSynthesis' in window)) {
+                alert('Text-to-speech is not supported in this browser.');
+                return;
+            }
+
+            const text = document.getElementById(textareaId).value.trim();
+            if (!text) return;
+
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            const chosenVoiceName = document.getElementById('voiceSelect').value;
+
+            // Apply selected custom voice if available, otherwise apply auto-detect voice logic
+            if (chosenVoiceName && chosenVoiceName !== 'auto') {
+                const match = voicesList.find(v => v.name === chosenVoiceName);
+                if (match) utterance.voice = match;
+            } else {
+                let hebCount = 0;
+                for (let char of text) {
+                    if (char >= 'א' && char <= 'ת') hebCount++;
+                }
+                const ratio = hebCount / text.length;
+
+                if (ratio > 0.3) {
+                    utterance.lang = 'he-IL';
+                } else {
+                    utterance.lang = 'en-US';
+                }
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Suggestion 3: Text Statistics calculator
+        function updateTextStats(textareaId, statsId) {
+            const text = document.getElementById(textareaId).value;
+            const charCount = text.length;
+            
+            // Split clean words by standard whitespace patterns
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+            const wordCount = words.length;
+
+            document.getElementById(statsId).innerText = `Words: ${wordCount} | Characters: ${charCount}`;
+        }
+
+        function refreshStats() {
+            updateTextStats('inputText', 'inputTextStats');
+            updateTextStats('outputText', 'outputTextStats');
+        }
+
+        // Auto-Copy Debounce Logic
+        function triggerAutoCopyDebounce() {
+            const autoCopyChecked = document.getElementById('autoCopyToggle').checked;
+            if (!autoCopyChecked) return;
+
+            if (autoCopyTimeout) {
+                clearTimeout(autoCopyTimeout);
+            }
+
+            // Read the custom delay duration from selector
+            const delayValue = parseInt(document.getElementById('autoCopyDelay').value) || 1500;
+
+            autoCopyTimeout = setTimeout(async () => {
+                const text = document.getElementById('outputText').value;
+                if (!text.trim()) return;
+
+                try {
+                    await navigator.clipboard.writeText(text);
+                    const copyBtn = document.getElementById('copyBtn');
+                    showTemporaryText(copyBtn, 'Auto-Copied!');
+
+                    const inputVal = document.getElementById('inputText').value;
+                    addToHistory(inputVal, text);
+                } catch (err) {
+                    console.error('Auto-copy failed: ', err);
+                }
+            }, delayValue);
+        }
+
+        function showTemporaryText(element, message) {
+            const originalText = element.innerText;
+            element.innerText = message;
+            if (element.dataset.timeoutId) {
+                clearTimeout(Number(element.dataset.timeoutId));
+            }
+            const tId = setTimeout(() => {
+                element.innerText = originalText;
+                element.dataset.timeoutId = '';
+            }, 1500);
+            element.dataset.timeoutId = tId;
+        }
+
+        // Setup manual keyboard overrides for LTR / RTL direction
+        function setupDirectionHotkeys(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            textarea.addEventListener('keydown', (event) => {
+                if (event.ctrlKey) {
+                    if (event.code === 'ShiftLeft') {
+                        textarea.dir = 'ltr';
+                    } else if (event.code === 'ShiftRight') {
+                        textarea.dir = 'rtl';
+                    }
+                }
+            });
+        }
+
+        // Setup keyboard shortcuts: Escape to clear, Ctrl+Enter to manually trigger conversion
+        function setupKeyboardShortcuts() {
+            const inputText = document.getElementById('inputText');
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    if (document.activeElement.tagName === 'TEXTAREA') {
+                        clearAll();
+                    }
+                }
+            });
+
+            inputText.addEventListener('keydown', (event) => {
+                if (event.ctrlKey && event.key === 'Enter') {
+                    event.preventDefault(); // Stop newline entry
+                    convertAuto(true); // Force instant history logging
+                    if (document.getElementById('autoCopyToggle').checked) {
+                        copyToClipboard();
+                    }
+                }
+            });
+        }
+
+        // Setup live real-time typing events
+        function setupRealTimeConversion() {
+            const inputEl = document.getElementById('inputText');
+            const toggleEl = document.getElementById('autoConvertToggle');
+
+            inputEl.addEventListener('input', () => {
+                refreshStats();
+                if (toggleEl.checked) {
+                    convertAuto(false); // Typing logs to history later via stop-typing debounce
+                } else {
+                    updateWebActions();
+                }
+            });
+
+            toggleEl.addEventListener('change', () => {
+                if (toggleEl.checked) {
+                    convertAuto(false);
+                }
+            });
+        }
+
+        // Save toggle states, delay settings, and voice configurations to Local Storage
+        function saveSettings() {
+            const autoConvert = document.getElementById('autoConvertToggle').checked;
+            const autoCopy = document.getElementById('autoCopyToggle').checked;
+            const autoCopyDelay = document.getElementById('autoCopyDelay').value;
+            const selectedVoice = document.getElementById('voiceSelect').value;
+            
+            localStorage.setItem('autoConvert', autoConvert);
+            localStorage.setItem('autoCopy', autoCopy);
+            localStorage.setItem('autoCopyDelay', autoCopyDelay);
+            localStorage.setItem('selectedVoiceName', selectedVoice);
+        }
+
+        // Load theme and saved user options from Local Storage
+        function loadSettings() {
+            loadTheme();
+            
+            const autoConvert = localStorage.getItem('autoConvert');
+            const autoCopy = localStorage.getItem('autoCopy');
+            const autoCopyDelay = localStorage.getItem('autoCopyDelay');
+            
+            if (autoConvert !== null) {
+                document.getElementById('autoConvertToggle').checked = autoConvert === 'true';
+            }
+            if (autoCopy !== null) {
+                document.getElementById('autoCopyToggle').checked = autoCopy === 'true';
+            }
+            if (autoCopyDelay !== null) {
+                document.getElementById('autoCopyDelay').value = autoCopyDelay;
+            }
+        }
+
+        // Theme management
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.getElementById('themeToggleBtn');
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                themeBtn.innerText = 'Light Mode';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeBtn.innerText = 'Dark Mode';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Fetch theme preference
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeBtn = document.getElementById('themeToggleBtn');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeBtn.innerText = 'Light Mode';
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeBtn.innerText = 'Dark Mode';
+            }
+        }
+
+        // History Log Logic
+        function addToHistory(original, converted) {
+            const origTrimmed = original.trim();
+            const convTrimmed = converted.trim();
+            if (!origTrimmed || !convTrimmed) return;
+
+            // Prevent duplicate adjacent entries
+            if (historyLog.length > 0 && historyLog[0].converted === convTrimmed) {
+                return;
+            }
+
+            historyLog.unshift({ original: origTrimmed, converted: convTrimmed });
+
+            if (historyLog.length > 5) {
+                historyLog.pop();
+            }
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const historySection = document.getElementById('historySection');
+            const historyList = document.getElementById('historyList');
+            
+            if (historyLog.length === 0) {
+                historySection.style.display = 'none';
+                return;
+            }
+            
+            historySection.style.display = 'block';
+            historyList.innerHTML = '';
+
+            historyLog.forEach((item) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'history-item';
+                
+                const textSpan = document.createElement('span');
+                textSpan.className = 'history-text';
+                textSpan.dir = 'auto';
+                textSpan.innerText = `${item.original} → ${item.converted}`;
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'btn-utility';
+                copyBtn.style.fontSize = '12px';
+                copyBtn.style.padding = '3px 8px';
+                copyBtn.innerText = 'Copy';
+                copyBtn.onclick = async () => {
+                    try {
+                        await navigator.clipboard.writeText(item.converted);
+                        showTemporaryText(copyBtn, 'Copied!');
+                    } catch (e) {
+                        console.error('Failed to copy history item: ', e);
+                    }
+                };
+
+                itemDiv.appendChild(textSpan);
+                itemDiv.appendChild(copyBtn);
+                historyList.appendChild(itemDiv);
+            });
+        }
+
+        // Initialize features and bind settings storage on startup
+        loadSettings();
+        setupDirectionHotkeys('inputText');
+        setupDirectionHotkeys('outputText');
+        setupKeyboardShortcuts();
+        setupRealTimeConversion();
+        refreshStats(); // Set initial zero states for counters
+
+        // Fetch voices synchronously or bind async voice population callback depending on browser behavior
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        } else {
+            populateVoiceList();
+        }
+
+        // Save preferences changes dynamically
+        document.getElementById('autoConvertToggle').addEventListener('change', saveSettings);
+        document.getElementById('autoCopyToggle').addEventListener('change', saveSettings);
+        document.getElementById('voiceSelect').addEventListener('change', saveSettings);
+        document.getElementById('autoCopyDelay').addEventListener('change', () => {
+            saveSettings();
+            triggerAutoCopyDebounce(); // Triggers instant recalculation on delay shift
+        });
+        // ADD THIS AT THE VERY BOTTOM OF THE <script> TAG IN index.html
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+            .then(reg => console.log('Service Worker registered.'))
+            .catch(err => console.error('Service Worker failed: ', err));
+    });
+}
+    </script>
+</body>
+</html>
